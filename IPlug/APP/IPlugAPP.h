@@ -55,6 +55,10 @@ public:
   //IPlugAPP
   void AppProcess(double** inputs, double** outputs, int nFrames);
 
+  /** Access the standalone app host (e.g. to list/switch audio I/O
+   * devices from plugin UI). Only valid for the lifetime of the app. */
+  IPlugAPPHost* GetAppHost() const { return mAppHost; }
+
 private:
   IPlugAPPHost* mAppHost = nullptr;
   IPlugQueue<IMidiMsg> mMidiMsgsFromCallback {MIDI_TRANSFER_SIZE};

@@ -1169,7 +1169,16 @@ static void MakeCursorFromName(NSCursor*& cursor, const char *name)
     wp = {bounds.origin.x, bounds.origin.y};
   }
   
-  [pNSMenu popUpMenuPositioningItem:pSelectedItem atLocation:wp inView:self];
+  if (@available(macOS 14.0, *))
+  {
+    // popUpMenuPositioningItem:atLocation:inView: is deprecated and a no-op on
+    // recent macOS. popUpContextMenu tracks from the current mouse event.
+    [NSMenu popUpContextMenu:pNSMenu withEvent:[NSApp currentEvent] forView:self];
+  }
+  else
+  {
+    [pNSMenu popUpMenuPositioningItem:pSelectedItem atLocation:wp inView:self];
+  }
   
   NSMenuItem* pChosenItem = [pDummyView menuItem];
   NSMenu* pChosenMenu = [pChosenItem menu];

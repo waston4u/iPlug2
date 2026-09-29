@@ -233,6 +233,30 @@ std::optional<uint32_t> IPlugAPPHost::GetAudioDeviceID(const char* deviceNameToT
   return std::nullopt;
 }
 
+std::vector<std::string> IPlugAPPHost::GetAudioInputDeviceNames() const
+{
+  std::vector<std::string> names;
+  for (auto deviceID : mAudioInputDevIDs)
+    names.push_back(GetAudioDeviceName(deviceID));
+  return names;
+}
+
+const char* IPlugAPPHost::GetAudioInputDeviceName() const
+{
+  return mState.mAudioInDev.Get();
+}
+
+bool IPlugAPPHost::SetAudioInputDevice(const char* name)
+{
+  mState.mAudioInDev.Set(name);
+  // Reset IO channel selection like the preferences dialog does
+  mState.mAudioInChanL = 1;
+  mState.mAudioInChanR = 2;
+  const bool ok = TryToChangeAudio();
+  UpdateINI();
+  return ok;
+}
+
 int IPlugAPPHost::GetMIDIPortNumber(ERoute direction, const char* nameToTest) const
 {
   int start = 1;

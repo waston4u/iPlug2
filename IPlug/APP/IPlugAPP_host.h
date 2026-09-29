@@ -206,6 +206,19 @@ public:
   * @param name The name of the audio device to test
   * @return The ID RTAudio has given the audio device if found */
   std::optional<uint32_t> GetAudioDeviceID(const char* name) const;
+
+  /** Returns the names of all probed audio input devices (call ProbeAudioIO
+   * first to refresh the list) */
+  std::vector<std::string> GetAudioInputDeviceNames() const;
+
+  /** Returns the currently configured audio input device name */
+  const char* GetAudioInputDeviceName() const;
+
+  /** Switch the audio input device, re-initialising the driver and saving
+   * the choice to the INI file
+   * @param name A device name from GetAudioInputDeviceNames()
+   * @return true if the driver restarted on the new device */
+  bool SetAudioInputDevice(const char* name);
   
   /** @param direction Either kInput or kOutput
    * @param name The name of the midi device

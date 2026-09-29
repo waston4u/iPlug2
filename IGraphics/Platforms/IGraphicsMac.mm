@@ -597,24 +597,23 @@ bool IGraphicsMac::PromptForColor(IColor& color, const char* str, IColorPickerHa
 
 IPopupMenu* IGraphicsMac::CreatePlatformPopupMenu(IPopupMenu& menu, const IRECT bounds, bool& isAsync)
 {
-  isAsync = true;
-  
-  dispatch_async(dispatch_get_main_queue(), ^{
-    IPopupMenu* pReturnMenu = nullptr;
+  // Run the menu's modal tracking loop synchronously inside the mouse-down
+  // handler (as TrackPopupMenu does on Windows). A deferred open loses the
+  // mouse state, so the menu dismisses instantly on modern macOS.
+  isAsync = false;
 
-    if (mView)
-    {
-      NSRect areaRect = ToNSRect(this, bounds);
-      pReturnMenu = [(IGRAPHICS_VIEW*) mView createPopupMenu: menu: areaRect];
-    }
+  IPopupMenu* pReturnMenu = nullptr;
 
-    if (pReturnMenu && pReturnMenu->GetFunction())
-      pReturnMenu->ExecFunction();
-    
-    this->SetControlValueAfterPopupMenu(pReturnMenu);
-  });
+  if (mView)
+  {
+    NSRect areaRect = ToNSRect(this, bounds);
+    pReturnMenu = [(IGRAPHICS_VIEW*) mView createPopupMenu: menu: areaRect];
+  }
 
-  return nullptr;
+  if (pReturnMenu && pReturnMenu->GetFunction())
+    pReturnMenu->ExecFunction();
+
+  return pReturnMenu;
 }
 
 void IGraphicsMac::CreatePlatformTextEntry(int paramIdx, const IText& text, const IRECT& bounds, int length, const char* str)
